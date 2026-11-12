@@ -1,0 +1,11 @@
+# Install PyTorch FIRST (matching your CUDA version), see README step 3.
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9
+numpy
+soundfile>=0.12
+faster-whisper>=1.0.3
+transformers>=4.43
+sentencepiece
+coqui-tts>=0.24
+demucs>=4.0.1
