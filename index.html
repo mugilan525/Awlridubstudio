@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWLRI Dub Studio</title>
+<style>
+  :root{
+    --bg:#0c0f14; --panel:#131820; --panel2:#191f29; --line:#252d3a;
+    --text:#e9edf3; --muted:#8b96a8; --accent:#f2a93b; --accent2:#2fc4b2;
+    --bad:#ef5d5d; --radius:14px;
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, "Noto Sans", "Noto Sans Tamil", "Noto Sans Devanagari", sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+  header{display:flex;align-items:center;justify-content:space-between;padding:22px 32px;border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:14px}
+  .mark{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--accent),#e0712c);
+        display:grid;place-items:center;font-weight:800;color:#1a1004;font-size:20px;letter-spacing:-1px}
+  .brand h1{font-size:18px;margin:0;letter-spacing:.2px}
+  .brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+  .badge{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:6px 11px;border-radius:999px}
+  .badge b{color:var(--accent2);font-weight:600}
+  main{flex:1;display:grid;grid-template-columns:380px 1fr;gap:28px;padding:28px 32px;max-width:1400px;width:100%;margin:0 auto}
+  @media (max-width:900px){main{grid-template-columns:1fr;padding:18px}header{padding:16px 18px}}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin:0 0 14px;font-weight:600}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+  .drop{border:1.5px dashed #344052;border-radius:12px;padding:30px 18px;text-align:center;cursor:pointer;transition:.15s;background:var(--panel2)}
+  .drop:hover,.drop.over{border-color:var(--accent);background:#1e1a14}
+  .drop .big{font-size:15px;font-weight:600;margin:10px 0 4px}
+  .drop .small{font-size:12.5px;color:var(--muted)}
+  .drop svg{opacity:.8}
+  .file{margin-top:12px;font-size:13.5px;color:var(--accent);word-break:break-all;min-height:18px}
+  .field{margin-top:20px}
+  .label{font-size:13px;color:var(--muted);margin-bottom:9px}
+  .chips{display:flex;gap:9px;flex-wrap:wrap}
+  .chip{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:9px 14px;border-radius:10px;cursor:pointer;font-size:14px;user-select:none;display:flex;align-items:center;gap:8px}
+  .chip.on{border-color:var(--accent);background:#2a2114}
+  .chip .tick{width:16px;height:16px;border-radius:5px;border:1.5px solid #4a5568;display:grid;place-items:center;font-size:11px}
+  .chip.on .tick{background:var(--accent);border-color:var(--accent);color:#1a1004}
+  .flow{display:flex;align-items:center;gap:10px;font-size:14px;margin-top:4px}
+  .flow .ta{padding:7px 12px;border-radius:9px;background:#1b2a2a;color:var(--accent2);border:1px solid #234040}
+  .toggle{display:flex;align-items:flex-start;gap:12px;cursor:pointer;font-size:14px}
+  .toggle input{display:none}
+  .sw{width:38px;height:22px;border-radius:999px;background:#2b3442;position:relative;flex:none;transition:.15s;margin-top:1px}
+  .sw:after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#cfd6e0;top:3px;left:3px;transition:.15s}
+  .toggle input:checked + .sw{background:var(--accent2)}
+  .toggle input:checked + .sw:after{left:19px;background:#fff}
+  .toggle small{display:block;color:var(--muted);font-size:12.5px;margin-top:3px}
+  button.go{margin-top:22px;width:100%;padding:13px;border:none;border-radius:11px;background:var(--accent);color:#1a1004;font-weight:700;font-size:15px;cursor:pointer}
+  button.go:disabled{opacity:.4;cursor:not-allowed}
+  .up{height:6px;background:#232b37;border-radius:9px;margin-top:12px;overflow:hidden;display:none}
+  .up i{display:block;height:100%;background:var(--accent);width:0}
+  .msg{font-size:13px;margin-top:10px;min-height:16px;color:var(--muted)}
+  .msg.err{color:var(--bad)}
+  .note{font-size:12px;color:var(--muted);line-height:1.55;margin-top:16px}
+
+  .jobs{display:flex;flex-direction:column;gap:14px}
+  .empty{color:var(--muted);text-align:center;padding:60px 20px;border:1px dashed var(--line);border-radius:var(--radius);font-size:14px}
+  .job{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px}
+  .jtop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+  .jname{font-weight:600;font-size:15px;word-break:break-all}
+  .jmeta{color:var(--muted);font-size:12.5px;margin-top:4px}
+  .pill{font-size:11.5px;padding:4px 10px;border-radius:999px;white-space:nowrap;font-weight:600;letter-spacing:.3px}
+  .pill.queued{background:#262e3b;color:#aab4c4}.pill.running{background:#2a2114;color:var(--accent)}
+  .pill.done{background:#123029;color:var(--accent2)}.pill.failed{background:#3a1717;color:var(--bad)}.pill.cancelled{background:#262e3b;color:var(--muted)}
+  .bar{height:7px;background:#232b37;border-radius:9px;margin-top:14px;overflow:hidden}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#e0712c);transition:width .6s}
+  .stage{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:8px}
+  .err{color:var(--bad);font-size:13px;margin-top:10px}
+  .acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:7px 12px;font-size:13px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+  .btn:hover{border-color:#3a4658}
+  .btn.ghost{background:none;color:var(--muted)}
+
+  .player{margin-top:16px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .tab{padding:7px 14px;border-radius:9px;border:1px solid var(--line);background:none;color:var(--muted);cursor:pointer;font-size:13.5px}
+  .tab.on{background:var(--accent);border-color:var(--accent);color:#1a1004;font-weight:600}
+  audio{width:100%;height:40px}
+  .hint{font-size:12px;color:var(--muted);margin-top:8px}
+  .tx{margin-top:12px;max-height:340px;overflow:auto;border-top:1px solid var(--line)}
+  .row{display:grid;grid-template-columns:64px 1fr;gap:10px;padding:10px 6px;border-bottom:1px solid #1f2632;cursor:pointer;font-size:13.5px;line-height:1.5}
+  .row:hover{background:#1c232e}
+  .row.now{background:#231d12}
+  .row .t{color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px;padding-top:2px}
+  .row .ta{color:#c5ccd7}
+  .row .tr{color:var(--text);margin-top:3px}
+  .row .tr span{color:var(--accent2);font-size:11px;margin-right:6px;font-weight:600}
+  .dl{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  footer{text-align:center;padding:22px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line)}
+  footer b{color:var(--accent);letter-spacing:.5px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="mark">A</div>
+    <div>
+      <h1>AWLRI Dub Studio</h1>
+      <p>Tamil speech → English &amp; Hindi, in the same voice</p>
+    </div>
+  </div>
+  <div class="badge" id="device">Checking hardware…</div>
+</header>
+
+<main>
+  <section>
+    <h2>New dub</h2>
+    <div class="card">
+      <div class="drop" id="drop">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#f2a93b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 0L7 8m5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+        <div class="big">Drop Tamil audio here</div>
+        <div class="small">or click to choose · MP3, WAV, M4A, OGG, MP4 · up to <span id="maxmin">40</span> min</div>
+        <input type="file" id="fileIn" accept="audio/*,video/*" hidden>
+      </div>
+      <div class="file" id="fileName"></div>
+
+      <div class="field">
+        <div class="label">Translate into</div>
+        <div class="flow"><span class="ta">தமிழ் Tamil</span> →</div>
+        <div class="chips" style="margin-top:10px">
+          <div class="chip on" data-lang="en"><span class="tick">✓</span>English</div>
+          <div class="chip on" data-lang="hi"><span class="tick">✓</span>हिन्दी Hindi</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="toggle">
+          <input type="checkbox" id="keepBg" checked><span class="sw"></span>
+          <span>Keep background music &amp; sounds<small>Removes only the Tamil voice and keeps everything else. Turn off for plain speech recordings (faster).</small></span>
+        </label>
+      </div>
+
+      <button class="go" id="go" disabled>Start dubbing</button>
+      <div class="up" id="up"><i></i></div>
+      <div class="msg" id="msg"></div>
+      <p class="note">The speaker's own voice is learned from the upload itself. Each translated line is placed at the same time as the original line. Files stay on this computer.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Your dubs</h2>
+    <div class="jobs" id="jobs"><div class="empty">Nothing yet. Upload a Tamil recording to get started.</div></div>
+  </section>
+</main>
+
+<footer>Private workspace · Powered by <b>AWLRI</b></footer>
+
+<script>
+const $ = s => document.querySelector(s);
+const O = location.origin; // works even if the login was typed into the address bar
+const LANG = {ta:"Tamil", en:"English", hi:"Hindi"};
+let file = null, jobsCache = [], open = {}, transcripts = {};
+
+fetch(O+"/api/config").then(r=>r.json()).then(c=>{
+  $("#maxmin").textContent = c.max_minutes;
+  $("#device").innerHTML = "Running on <b>"+esc(c.device)+"</b>";
+});
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function mmss(t){t=Math.max(0,Math.round(t));const h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=t%60;return (h?h+":"+String(m).padStart(2,"0"):m)+":"+String(s).padStart(2,"0")}
+function ago(ts){const d=(Date.now()/1000-ts);if(d<60)return"just now";if(d<3600)return Math.floor(d/60)+" min ago";if(d<86400)return Math.floor(d/3600)+" h ago";return new Date(ts*1000).toLocaleDateString()}
+
+// ---------- upload form
+const drop = $("#drop"), fileIn = $("#fileIn");
+drop.onclick = () => fileIn.click();
+fileIn.onchange = () => setFile(fileIn.files[0]);
+["dragenter","dragover"].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add("over")}));
+["dragleave","drop"].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove("over")}));
+drop.addEventListener("drop",ev=>{ if(ev.dataTransfer.files[0]) setFile(ev.dataTransfer.files[0]) });
+function setFile(f){ file=f; $("#fileName").textContent = f ? "♪ "+f.name+"  ·  "+(f.size/1048576).toFixed(1)+" MB" : ""; check(); }
+document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{c.classList.toggle("on");check()});
+function langs(){return [...document.querySelectorAll(".chip.on")].map(c=>c.dataset.lang)}
+function check(){ $("#go").disabled = !file || !langs().length; }
+
+$("#go").onclick = () => {
+  const fd = new FormData();
+  fd.append("file", file); fd.append("langs", langs().join(",")); fd.append("keep_background", $("#keepBg").checked);
+  const xhr = new XMLHttpRequest();
+  $("#go").disabled = true; $("#up").style.display="block"; msg("Uploading…");
+  xhr.upload.onprogress = e => { if(e.lengthComputable){ $("#up i").style.width=(100*e.loaded/e.total)+"%"; msg("Uploading… "+Math.round(100*e.loaded/e.total)+"%") } };
+  xhr.onload = () => {
+    $("#up").style.display="none"; $("#up i").style.width="0";
+    if (xhr.status===200){ msg("Added to the queue."); setFile(null); fileIn.value=""; const j=JSON.parse(xhr.responseText); open[j.id]=true; refresh(); }
+    else { let d="Upload failed"; try{d=JSON.parse(xhr.responseText).detail}catch(e){} msg(d,true); check(); }
+  };
+  xhr.onerror = () => { msg("Network error during upload.", true); check(); $("#up").style.display="none"; };
+  xhr.open("POST",O+"/api/jobs"); xhr.send(fd);
+};
+function msg(t,err){ const m=$("#msg"); m.textContent=t; m.className="msg"+(err?" err":""); }
+
+// ---------- jobs list
+async function refresh(){
+  try{ jobsCache = await (await fetch(O+"/api/jobs")).json(); }catch(e){ return; }
+  render();
+}
+function render(){
+  const box = $("#jobs");
+  if(!jobsCache.length){ box.innerHTML='<div class="empty">Nothing yet. Upload a Tamil recording to get started.</div>'; return; }
+  // keep existing nodes for finished jobs that are open (so audio keeps playing)
+  const keep = {};
+  box.querySelectorAll(".job").forEach(n=>keep[n.dataset.id]=n);
+  const frag = [];
+  for(const j of jobsCache){
+    let n = keep[j.id];
+    const sig = j.status+"|"+j.progress+"|"+j.stage+"|"+!!open[j.id];
+    if(n && n.dataset.sig===sig){ frag.push(n); continue; }
+    if(n && j.status==="done" && n.dataset.status==="done" && n.dataset.open===String(!!open[j.id])){ frag.push(n); continue; }
+    n = document.createElement("div"); n.className="job"; n.dataset.id=j.id;
+    n.dataset.sig=sig; n.dataset.status=j.status; n.dataset.open=String(!!open[j.id]);
+    n.innerHTML = jobHtml(j);
+    frag.push(n);
+    if(j.status==="done" && open[j.id]) setTimeout(()=>mountPlayer(n,j),0);
+  }
+  box.replaceChildren(...frag);
+}
+function jobHtml(j){
+  const pct = Math.round((j.progress||0)*100);
+  const label = {queued:"Queued",running:"Processing",done:"Ready",failed:"Failed",cancelled:"Cancelled"}[j.status];
+  let h = `<div class="jtop"><div><div class="jname">${esc(j.name)}</div>
+    <div class="jmeta">${mmss(j.duration)} · Tamil → ${j.langs.map(l=>LANG[l]).join(" + ")}${j.keep_background?" · with background":""} · ${ago(j.created)}</div></div>
+    <span class="pill ${j.status}">${label}</span></div>`;
+  if(j.status==="running"||j.status==="queued"){
+    let eta = "";
+    if(j.status==="running" && j.started && j.progress>0.04){ const el=Date.now()/1000-j.started; eta = "about "+mmss(el/j.progress-el)+" left"; }
+    h += `<div class="bar"><i style="width:${pct}%"></i></div><div class="stage"><span>${esc(j.stage)}</span><span>${j.status==="running"?pct+"% "+(eta?"· "+eta:""):""}</span></div>
+      <div class="acts"><button class="btn ghost" onclick="act('${j.id}','cancel')">Cancel</button></div>`;
+  }
+  if(j.status==="failed") h += `<div class="err">${esc(j.error||"Something went wrong.")}</div>`;
+  if(j.status==="done"){
+    const took = j.finished&&j.started ? " · processed in "+mmss(j.finished-j.started) : "";
+    h += `<div class="jmeta" style="margin-top:6px">${j.segments||""} lines dubbed${took}</div>`;
+    h += `<div class="acts"><button class="btn" onclick="toggle('${j.id}')">${open[j.id]?"Hide":"Listen & download"}</button>
+          <button class="btn ghost" onclick="act('${j.id}','delete')">Delete</button></div>`;
+    if(open[j.id]) h += `<div class="player" data-player></div>`;
+  } else if(j.status!=="running"&&j.status!=="queued"){
+    h += `<div class="acts"><button class="btn ghost" onclick="act('${j.id}','delete')">Delete</button></div>`;
+  }
+  return h;
+}
+function toggle(id){ open[id]=!open[id]; render(); }
+async function act(id,what){
+  if(what==="delete" && !confirm("Delete this dub and its files?")) return;
+  const r = await fetch(O+`/api/jobs/${id}`+(what==="cancel"?"/cancel":""),{method:what==="cancel"?"POST":"DELETE"});
+  if(!r.ok){ try{alert((await r.json()).detail)}catch(e){} }
+  refresh();
+}
+
+// ---------- synced player: switching language keeps the same position
+async function mountPlayer(node,j){
+  const box = node.querySelector("[data-player]"); if(!box) return;
+  const audios = j.outputs.filter(o=>o.kind==="audio");
+  const base = O+`/api/jobs/${j.id}/files/`;
+  box.innerHTML = `<div class="tabs">${audios.map((o,i)=>`<button class="tab ${i===1||audios.length===1?"on":""}" data-src="${o.file}" data-lang="${o.lang}">${LANG[o.lang]}${o.lang==="ta"?" (original)":""}</button>`).join("")}</div>
+    <audio controls preload="metadata"></audio>
+    <div class="hint">Switch language while playing — it continues from the same moment, so you can check the sync. Click any line to jump to it.</div>
+    <div class="tx"></div>
+    <div class="dl">${j.outputs.filter(o=>o.lang!=="ta"||o.kind!=="audio").map(o=>`<a class="btn" href="${base+o.file}?download=true">⬇ ${esc(o.label)}</a>`).join("")}</div>`;
+  const audio = box.querySelector("audio");
+  let cur = box.querySelector(".tab.on");
+  audio.src = base + cur.dataset.src;
+  box.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+    const pos = audio.currentTime, playing = !audio.paused;
+    box.querySelectorAll(".tab").forEach(x=>x.classList.remove("on")); t.classList.add("on"); cur=t;
+    audio.src = base + t.dataset.src;
+    audio.addEventListener("loadedmetadata",()=>{ audio.currentTime=pos; if(playing) audio.play(); },{once:true});
+    drawTx();
+  });
+  if(!transcripts[j.id]){ try{ transcripts[j.id] = await (await fetch(O+`/api/jobs/${j.id}/transcript`)).json(); }catch(e){ transcripts[j.id]=[]; } }
+  const segs = transcripts[j.id], tx = box.querySelector(".tx");
+  function drawTx(){
+    const l = cur.dataset.lang==="ta" ? j.langs[0] : cur.dataset.lang;
+    tx.innerHTML = segs.map((s,i)=>`<div class="row" data-i="${i}"><div class="t">${mmss(s.start)}</div><div><div class="ta">${esc(s.ta)}</div><div class="tr"><span>${l.toUpperCase()}</span>${esc(s[l])}</div></div></div>`).join("");
+    tx.querySelectorAll(".row").forEach(r=>r.onclick=()=>{ audio.currentTime=segs[r.dataset.i].start; audio.play(); });
+  }
+  drawTx();
+  let last=-1;
+  audio.ontimeupdate = () => {
+    const t = audio.currentTime; let k=-1;
+    for(let i=0;i<segs.length;i++){ if(segs[i].start<=t+0.05) k=i; else break; }
+    if(k!==last){ tx.querySelectorAll(".row.now").forEach(r=>r.classList.remove("now")); const r=tx.querySelector(`[data-i="${k}"]`); if(r){r.classList.add("now"); r.scrollIntoView({block:"nearest"});} last=k; }
+  };
+}
+
+refresh();
+setInterval(()=>{ if(jobsCache.some(j=>j.status==="running"||j.status==="queued")) refresh(); }, 2000);
+</script>
+</body>
+</html>
